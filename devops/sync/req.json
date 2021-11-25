@@ -2,9 +2,10 @@
   [
     {
       "plugin": "jira",
-      "Options": {
+      "options": {
         "boardId": 8,
-        "sourceId": 1
+        "sourceId": 1,
+        "since": "2006-01-02T15:04:05Z"
       }
     },
     {
