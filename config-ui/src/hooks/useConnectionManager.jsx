@@ -8,6 +8,8 @@ import request from '@/utils/request'
 import { NullConnection } from '@/data/NullConnection'
 import { Providers, ProviderSourceLimits } from '@/data/Providers'
 
+import useNetworkOfflineMode from '@/hooks/useNetworkOfflineMode'
+
 function useConnectionManager ({
   activeProvider,
   connectionId,
@@ -25,6 +27,7 @@ function useConnectionManager ({
   // showError, setShowError
 }, updateMode = false) {
   const history = useHistory()
+  const { handleOfflineMode } = useNetworkOfflineMode()
 
   const [name, setName] = useState()
   const [endpointUrl, setEndpointUrl] = useState()
@@ -54,32 +57,40 @@ function useConnectionManager ({
     setIsTesting(true)
     setShowError(false)
     ToastNotification.clear()
-    const connectionTestPayload = {
-      name,
-      endpointUrl,
-      token,
-      username,
-      password
-    }
-    const testResponse = {
-      success: false,
-      connection: {
-        ...connectionTestPayload
-      },
-      errors: []
-    }
-    console.log(testResponse)
-    setTimeout(() => {
-      if (testResponse.success) {
+    // TODO: run Save first
+    const runTest = async () => {
+      let queryParams = ``
+      switch (activeProvider.id) {
+        case Providers.JENKINS:
+          queryParams = `?username=${username}&password=${password}&endpoint=${endpointUrl}`
+          break
+        case Providers.GITLAB:
+          queryParams = `?auth=${token}&endpoint=${endpointUrl}`
+          break
+        case Providers.GITHUB:
+          queryParams = `?auth=${token}&endpoint=${endpointUrl}`
+          break
+        case Providers.JIRA:
+          queryParams = `?auth=${token}&endpoint=${endpointUrl}`
+          break
+      }
+      let testUrl = `${DEVLAKE_ENDPOINT}/plugins/${activeProvider.id}/test`
+      let getUrl = testUrl + queryParams
+      console.log('INFO >>> GET URL for testing: ', getUrl);
+      let res = await request.get(getUrl)
+      console.log('res.data', res.data);
+      if (res?.data?.Success && res.status === 200) {
         setIsTesting(false)
         setTestStatus(1)
         ToastNotification.show({ message: 'Connection test OK.', intent: 'success', icon: 'small-tick' })
       } else {
         setIsTesting(false)
         setTestStatus(2)
-        ToastNotification.show({ message: 'Connection test FAILED.', intent: 'danger', icon: 'error' })
+        let errorMessage = 'Connection test FAILED. ' + res?.data?.Message
+        ToastNotification.show({ message: errorMessage, intent: 'danger', icon: 'error' })
       }
-    }, 2000)
+    }
+    runTest()
   }
 
   const saveConnection = () => {
@@ -249,8 +260,9 @@ function useConnectionManager ({
       setConnectionCount(0)
       setConnectionLimitReached(false)
       setErrors([e.message])
+      handleOfflineMode(e.response.status, e.response)
     }
-  }, [activeProvider.id, sourceLimits])
+  }, [activeProvider.id, sourceLimits, handleOfflineMode])
 
   const deleteConnection = useCallback(async (connection) => {
     try {

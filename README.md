@@ -2,7 +2,7 @@
 <br />
 <img src="https://user-images.githubusercontent.com/3789273/128085813-92845abd-7c26-4fa2-9f98-928ce2246616.png" width="120px">
 
-# Dev Lake
+# DevLake
 <p>
     
   </p>
@@ -20,10 +20,10 @@
 <br>
 <div align="left">
 
-### What is Dev Lake?
-Dev Lake brings all your DevOps data into one practical, personalized, extensible view. Ingest, analyze, and visualize data from an ever-growing list of developer tools, with our free and open source product.
+### What is DevLake?
+DevLake brings all your DevOps data into one practical, personalized, extensible view. Ingest, analyze, and visualize data from an ever-growing list of developer tools, with our free and open source product.
 
-Dev Lake is most exciting for leaders and managers looking to make better sense of their development data, though it's useful for any developer looking to bring a more data-driven approach to their own practices. With Dev Lake you can ask your process any question, just connect and query. 
+DevLake is most exciting for leaders and managers looking to make better sense of their development data, though it's useful for any developer looking to bring a more data-driven approach to their own practices. With DevLake you can ask your process any question, just connect and query. 
 
 
 #### Get started with just a few clicks
@@ -58,13 +58,13 @@ Dev Lake is most exciting for leaders and managers looking to make better sense 
 
 
 
-### Why Dev Lake?
+### Why DevLake?
 1. Comprehensive understanding of software development lifecycle, digging workflow bottlenecks
 2. Timely review of team iteration performance, rapid feedback, agile adjustment
 3. Quickly build scenario-based data dashboards and drill down to analyze the root cause of problems
 
 
-### What can be accomplished with Dev Lake?
+### What can be accomplished with DevLake?
 1. Collect DevOps performance data for the whole process
 2. Share abstraction layer with similar tools to output standardized performance data
 3. Built-in 20+ performance metrics and drill-down analysis capability
@@ -178,7 +178,7 @@ GitHub | Summary, Data & Metrics, Configuration, Plugin API | <a href="plugins/g
 ****
 
 ## Setup Guide
-There're 3 ways to set up Dev Lake: user setup, developer setup and cloud setup.
+There're 3 ways to set up DevLake: user setup, developer setup and cloud setup.
 
 ### User setup<a id="user-setup"></a>
 
@@ -232,12 +232,6 @@ NOTE: After installing docker, you may need to run the docker application and re
    >           "owner": "merico-dev"
    >         }
    >       }
-   >     ],
-   >     [
-   >       {
-   >         "plugin": "github-domain",
-   >         "options": {}
-   >       }
    >     ]
    >   ]
    >   ```
@@ -247,7 +241,7 @@ NOTE: After installing docker, you may need to run the docker application and re
 
 #### Setup cron job
 
-To synchronize data periodically, we provide [`lake-cli`]((./cmd/lake-cli/README.md)) for easily sending data collection requests along with [a cron job](./devops/sync/README.md) to periodically trigger the cli tool. 
+To synchronize data periodically, we provide [`lake-cli`](./cmd/lake-cli/README.md) for easily sending data collection requests along with [a cron job](./devops/sync/README.md) to periodically trigger the cli tool. 
 
 <br>
 
@@ -327,10 +321,10 @@ To synchronize data periodically, we provide [`lake-cli`]((./cmd/lake-cli/README
 <br>
 
 ### Cloud setup<a id="cloud-setup"></a>
-If you want to run Dev Lake in a clound environment, you can set up Dev Lake with Tin. [See detailed setup guide](https://github.com/merico-dev/lake/wiki/How-to-Set-Up-Dev-Lake-with-Tin)
+If you want to run DevLake in a clound environment, you can set up DevLake with Tin. [See detailed setup guide](https://github.com/merico-dev/lake/wiki/How-to-Set-Up-Dev-Lake-with-Tin)
 
 **Disclaimer:** 
-> To protect your information, it is critical for users of the Tin hosting to set passwords to protect Dev Lake applications. We built Dev Lake as a self-hosted product, in part to ensure users have total protection and ownership of their data, while the same remains true for the Tin hosting, this risk point can only be eliminated by the end-user.
+> To protect your information, it is critical for users of the Tin hosting to set passwords to protect DevLake applications. We built DevLake as a self-hosted product, in part to ensure users have total protection and ownership of their data, while the same remains true for the Tin hosting, this risk point can only be eliminated by the end-user.
 
 <br>
 

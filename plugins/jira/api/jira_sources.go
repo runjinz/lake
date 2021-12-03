@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/merico-dev/lake/models/common"
 	"net/http"
 	"strconv"
 
@@ -21,14 +22,17 @@ func findSourceByInputParam(input *core.ApiResourceInput) (*models.JiraSource, e
 	if err != nil {
 		return nil, fmt.Errorf("invalid sourceId")
 	}
+	return getJiraSourceById(jiraSourceId)
+}
+
+func getJiraSourceById(id uint64) (*models.JiraSource, error) {
 	jiraSource := &models.JiraSource{}
-	err = lakeModels.Db.First(jiraSource, jiraSourceId).Error
+	err := lakeModels.Db.First(jiraSource, id).Error
 	if err != nil {
 		return nil, err
 	}
 	return jiraSource, nil
 }
-
 func mergeFieldsToJiraSource(jiraSource *models.JiraSource, sources ...map[string]interface{}) error {
 	// decode
 	for _, source := range sources {
@@ -70,7 +74,7 @@ func refreshAndSaveJiraSource(jiraSource *models.JiraSource, data map[string]int
 		err = tx.Create(jiraSource).Error
 	}
 	if err != nil {
-		if lakeModels.IsDuplicateError(err) {
+		if common.IsDuplicateError(err) {
 			return fmt.Errorf("jira source with name %s already exists", jiraSource.Name)
 		}
 		return err

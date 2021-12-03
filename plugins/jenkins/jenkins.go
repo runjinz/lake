@@ -50,14 +50,28 @@ func (j Jenkins) Execute(options map[string]interface{}, progress chan<- float32
 		Username: config.V.GetString("JENKINS_USERNAME"),
 		Password: config.V.GetString("JENKINS_PASSWORD"),
 	}
-	logger.Info("Jenkins config", op)
 	var err = mapstructure.Decode(options, &op)
 	if err != nil {
 		return fmt.Errorf("Failed to decode options: %v", err)
 	}
 	j.CleanData()
-	var worker = tasks.NewJenkinsWorker(nil, tasks.NewDeafultJenkinsStorage(lakeModels.Db), op.Host, op.Username, op.Password)
-	return worker.SyncJobs(progress)
+	var worker = tasks.NewJenkinsWorker(nil, tasks.NewDefaultJenkinsStorage(lakeModels.Db), op.Host, op.Username, op.Password)
+	err = worker.SyncJobs(progress)
+	if err != nil{
+		logger.Error("Fail to sync jobs", err)
+		return err
+	}
+	err = tasks.ConvertJobs()
+	if err != nil{
+		logger.Error("Fail to convert jobs", err)
+		return err
+	}
+	err = tasks.ConvertBuilds()
+	if err != nil{
+		logger.Error("Fail to convert builds", err)
+		return err
+	}
+	return nil
 }
 
 func (plugin Jenkins) RootPkgPath() string {
@@ -66,6 +80,9 @@ func (plugin Jenkins) RootPkgPath() string {
 
 func (plugin Jenkins) ApiResources() map[string]map[string]core.ApiResourceHandler {
 	return map[string]map[string]core.ApiResourceHandler{
+		"test": {
+			"GET": api.TestConnection,
+		},
 		"sources": {
 			"GET":  api.ListSources,
 			"POST": api.PostSource,

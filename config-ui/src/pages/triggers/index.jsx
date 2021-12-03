@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   AnchorButton,
   Spinner,
@@ -18,35 +18,55 @@ import SourcesUtil from '@/utils/sourcesUtil'
 
 const STAGE_INIT = 0
 const STAGE_PENDING = 1
-const STAGE_COMPELTED = 2
-let stage = STAGE_INIT
-let targetTaskIds = []
+const STAGE_FINISHED = 2
 
 export default function Triggers () {
-  const [pendingTasks, setPendingTasks] = useState([])
-  const [triggerDisabled, setTriggerDisabled] = useState([])
   const [triggerJson, setTriggerJson] = useState([[]])
+  const [pipeline, setPipeline] = useState(null)
+  const [tasks, setTasks] = useState(null)
 
-  // component mounted, run once
-  // @todo FIXME: React exhaustive dep warning, this needs to be wrapped in a useCallback (or async function moved inside)
-  useEffect(async () => {
-    stage = STAGE_INIT
-    targetTaskIds = []
+  // update stage based on pipeline existence and its status
+  const stage = useCallback(() => {
+    if (!pipeline) {
+      return STAGE_INIT;
+    }
+    if (pipeline.status !== 'TASK_COMPLETED') {
+      return STAGE_PENDING;
+    }
+    return STAGE_FINISHED;
+  }, [pipeline])()
+
+  const triggerDisabled = useCallback(() => {
+    return pipeline ? 'true' : 'false'
+  }, [pipeline])()
+
+  // try to reload pipeline/tasks from server every 3s after triggered
+  useEffect(() => {
     const interval = setInterval(async () => {
-      if (stage !== STAGE_PENDING) {
+      if (!pipeline || pipeline.status === 'TASK_COMPLETED') {
         return
       }
       try {
-        const res = await request.get(`${DEVLAKE_ENDPOINT}/task/pending`)
-        const tasks = res.data.tasks.filter(t => targetTaskIds.includes(t.ID))
-        if (tasks.length === 0) {
-          stage = STAGE_COMPELTED
+        const [pipelineRes, tasksRes] = await Promise.all([
+          request.get(`${DEVLAKE_ENDPOINT}/pipelines/${pipeline.ID}`),
+          request.get(`${DEVLAKE_ENDPOINT}/pipelines/${pipeline.ID}/tasks`),
+        ])
+        setPipeline(pipelineRes.data)
+
+        // convert to 2d array
+        const newTasks = []
+        for (const newTask of tasksRes.data.tasks) {
+          if (!newTasks[newTask.pipelineRow-1]) {
+            newTasks[newTask.pipelineRow-1] = []
+          }
+          newTasks[newTask.pipelineRow-1][newTask.pipelineCol-1] = newTask
         }
-        setPendingTasks(tasks)
+        console.log(newTasks)
+        setTasks(newTasks)
       } finally { }
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pipeline])
 
   useEffect(() => {
     console.log('Setting JSON based on active plugins...');
@@ -69,13 +89,14 @@ export default function Triggers () {
     // @todo RE_ACTIVATE Trigger Process!
     try {
       const res = await request.post(
-        `${DEVLAKE_ENDPOINT}/task`,
-        textAreaBody
+        `${DEVLAKE_ENDPOINT}/pipelines`,
+        JSON.stringify({
+          name: `config-ui trigger ${new Date()}`,
+          tasks: JSON.parse(textAreaBody)
+        })
       )
-      stage = STAGE_PENDING
-      setTriggerDisabled(true)
-      targetTaskIds = res.data.flat().map(t => t.ID)
-      console.log('waiting following tasks to complete: ', targetTaskIds)
+      setPipeline(res.data)
+      console.log('waiting following pipeline to complete: ', pipeline)
     } catch (e) {
       console.error(e)
     }
@@ -95,7 +116,7 @@ export default function Triggers () {
               { href: '/triggers', icon: false, text: 'Data Triggers' },
             ]}
           />
-          {stage === STAGE_COMPELTED &&
+          {stage === STAGE_FINISHED &&
             <div className='headlineContainer'>
               <h1>Done</h1>
               <p className='description'>Navigate to Grafana to view updated metrics</p>
@@ -110,28 +131,37 @@ export default function Triggers () {
             <div className='headlineContainer'>
               <h1>Collecting Data</h1>
               <p className='description'>Please wait... </p>
-
-              {pendingTasks.map(task => (
-                <div className='pluginSpinnerWrap' key={`key-${task.ID}`}>
-                  <div key={`progress-${task.ID}`}>
-                    <span style={{ display: 'inline-block', width: '100px' }}>{task.plugin}</span>
-                    {task.status === 'TASK_CREATED' &&
-                      <>
-                        <Spinner
-                          size={12}
-                          className='pluginSpinner'
-                        />
-                        <strong>{task.progress * 100}%</strong>
-                      </>}
-                    {task.status === 'TASK_FAILED' &&
-                      <>
-                        <span style={{ color: 'red', fontWeight: 'bold' }}>{task.status} </span>
-                        {task.message}
-                      </>}
+              {tasks && tasks.map((step, index) =>
+                <div key={index}>
+                <h2> Step {index+1}</h2>
+                {step.map(task =>
+                  <div className='pluginSpinnerWrap' key={`key-${task.ID}`}>
+                    <div key={`progress-${task.ID}`}>
+                      <span style={{ display: 'inline-block', width: '200px' }}>{task.plugin}</span>
+                      {task.status === 'TASK_RUNNING' &&
+                        <>
+                          <Spinner
+                            size={12}
+                            className='pluginSpinner'
+                          />
+                          <strong>{task.progress * 100}%</strong>
+                        </>}
+                      {task.status === 'TASK_COMPLETED' &&
+                        <>
+                          <span style={{ display: 'inline-block', color: 'green', fontWeight: 'bold', width: '80px' }}>Succeeded</span>
+                        </>}
+                      {task.status === 'TASK_FAILED' &&
+                        <>
+                          <span style={{ display: 'inline-block', color: 'red', fontWeight: 'bold', width: '80px' }}>Failed</span>
+                          <span style={{ display: 'inline-block', color: 'red' }}>{task.message}</span>
+                        </>}
+                    </div>
                   </div>
+                )}
                 </div>
-              ))}
-            </div>}
+              )}
+            </div>
+          }
           {stage === STAGE_INIT && (
             <>
               <div className='headlineContainer'>
@@ -150,14 +180,6 @@ export default function Triggers () {
                     For a project with 10k commits and 5k JIRA issues, this can take up to <em>20 minutes</em> for collecting JIRA, GitLab, and Jenkins data.&nbsp;
                     {/* eslint-disable-next-line max-len */}
                     The data collection will take longer for GitHub since they have a rate limit of 2k requests per hour. You can accelerate the process by configuring multiple personal access tokens.
-                  </p>
-                  <p className='description'>
-                    {/* eslint-disable-next-line max-len */}
-                    There are two types of plugins in our application, corresponding to the 2 lists in the following JSON.&nbsp;
-                    {/* eslint-disable-next-line max-len */}
-                    The regular plugins collect and enrich data (<em>the 1st list</em>) while the domain layer plugins (<em>the 2nd list</em>) prepare the data for the graphs in Grafana dashboards.&nbsp;
-                    {/* eslint-disable-next-line max-len */}
-                    You <strong>SHOULD ONLY</strong> have to edit the regular plugins. Editing domain layer plugins is for advanced usage only.&nbsp;
                   </p>
                   <p className='description' style={{ fontSize: '13px' }}>
                     <span style={{ fontWeight: 'bold' }}>Detailed configuration guide:</span>&nbsp;

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/bndr/gojenkins"
+	"github.com/merico-dev/lake/logger"
 	"github.com/merico-dev/lake/plugins/jenkins/models"
 )
 
@@ -35,12 +36,11 @@ func (worker *JenkinsWorker) SyncJobs(progress chan<- float32) error {
 		}
 		progress <- float32((index + 1)) / float32(len(jobs))
 	}
-	close(progress)
-
 	return nil
 }
 
 func (worker *JenkinsWorker) syncJob(ctx context.Context, job *gojenkins.Job) error {
+	logger.Info("syncJob", job.Raw.Name)
 	jobCtx, err := worker.storage.SaveJob(models.JenkinsJobProps{
 		Name:  job.Raw.Name,
 		Class: job.Raw.Class,

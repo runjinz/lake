@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/merico-dev/lake/models"
+	"github.com/merico-dev/lake/models/common"
 )
 
 // This Model is intended to be an association table between pull request commits and pull requests.
@@ -9,7 +9,7 @@ import (
 // (which are commits associated to a pull request) and pull requests.
 
 type GithubPullRequestCommitPullRequest struct {
-	PullRequestCommitSha string `gorm:"index"`
-	PullRequestId       int    `gorm:"index"`
-	models.NoPKModel
+	PullRequestCommitSha string `gorm:"primaryKey"`
+	PullRequestId        int    `gorm:"primaryKey;autoIncrement:false"`
+	common.NoPKModel
 }

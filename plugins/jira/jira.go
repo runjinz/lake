@@ -102,6 +102,12 @@ func (plugin Jira) Execute(options map[string]interface{}, progress chan<- float
 			"enrichIssues":      true,
 			"collectSprints":    true,
 			"collectUsers":      true,
+			"convertBoard":      true,
+			"convertIssues":     true,
+			"convertWorklogs":   true,
+			"convertChangelogs": true,
+			"convertUsers":      true,
+			"convertSprints":    true,
 		}
 	}
 
@@ -143,31 +149,74 @@ func (plugin Jira) Execute(options map[string]interface{}, progress chan<- float
 				return err
 			}
 		}
-		setBoardProgress(i, 0.5)
+		setBoardProgress(i, 0.1)
 		if tasksToRun["collectChangelogs"] {
 			err = tasks.CollectChangelogs(jiraApiClient, source, boardId, ctx)
 			if err != nil {
 				return err
 			}
 		}
-		setBoardProgress(i, 0.7)
+		setBoardProgress(i, 0.2)
 		if tasksToRun["enrichIssues"] {
 			err = tasks.EnrichIssues(source, boardId)
 			if err != nil {
 				return err
 			}
 		}
-		setBoardProgress(i, 0.8)
+		setBoardProgress(i, 0.3)
 		if tasksToRun["collectSprints"] {
 			err = tasks.CollectSprint(jiraApiClient, source, boardId)
 			if err != nil {
 				return err
 			}
 		}
+		setBoardProgress(i, 0.4)
+		if tasksToRun["convertBoard"] {
+			err := tasks.ConvertBoard(op.SourceId, boardId)
+			if err != nil {
+				return err
+			}
+		}
+		setBoardProgress(i, 0.5)
+		if tasksToRun["convertUsers"] {
+			err := tasks.ConvertUsers(op.SourceId)
+			if err != nil {
+				return err
+			}
+		}
+		setBoardProgress(i, 0.6)
+		if tasksToRun["convertIssues"] {
+			err = tasks.ConvertIssues(op.SourceId, boardId)
+			if err != nil {
+				return err
+			}
+		}
+		setBoardProgress(i, 0.7)
+		if tasksToRun["convertWorklogs"] {
+			err = tasks.ConvertWorklog(op.SourceId, boardId)
+			if err != nil {
+				return err
+			}
+		}
+		setBoardProgress(i, 0.8)
+		if tasksToRun["convertChangelogs"] {
+			err = tasks.ConvertChangelogs(op.SourceId, boardId)
+			if err != nil {
+				return err
+			}
+		}
+		setBoardProgress(i, 0.9)
+		if tasksToRun["convertSprints"] {
+			err = tasks.ConvertSprint(op.SourceId, boardId)
+			if err != nil {
+				logger.Error("convertSprints", err)
+				return err
+			}
+		}
 		setBoardProgress(i, 1.0)
+
 	}
 	logger.Print("end jira plugin execution")
-	close(progress)
 	return nil
 }
 
@@ -177,6 +226,9 @@ func (plugin Jira) RootPkgPath() string {
 
 func (plugin Jira) ApiResources() map[string]map[string]core.ApiResourceHandler {
 	return map[string]map[string]core.ApiResourceHandler{
+		"test": {
+			"GET": api.TestConnection,
+		},
 		"echo": {
 			"POST": func(input *core.ApiResourceInput) (*core.ApiResourceOutput, error) {
 				return &core.ApiResourceOutput{Body: input.Body}, nil
