@@ -23,7 +23,7 @@ import (
 	"github.com/apache/incubator-devlake/models/common"
 )
 
-type FeishuOkrUser struct {
+type FeishuChatMember struct {
 	MemberID     string `json:"member_id" gorm:"type:varchar(255)"`
 	Name         string `json:"name" gorm:"type:varchar(255)"`
 	MemberIDType string `json:"member_id_type" gorm:"type:varchar(255)"`
@@ -34,6 +34,6 @@ type FeishuOkrUser struct {
 	common.RawDataOrigin
 }
 
-func (FeishuOkrUser) TableName() string {
-	return "_tool_feishu_okr_user_okr"
+func (FeishuChatMember) TableName() string {
+	return "_tool_feishu_chat_user"
 }

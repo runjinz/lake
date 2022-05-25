@@ -15,28 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package models
+package apimodels
 
 import (
-	"time"
-
-	"github.com/apache/incubator-devlake/models/common"
+	"encoding/json"
 )
 
-type FeishuOkrUserOkr struct {
-	ID            string `json:"id" gorm:"type:varchar(255)"`
-	MemberID      string `json:"member_id" gorm:"type:varchar(255)"`
-	Name          string `json:"name" gorm:"type:varchar(255)"`
-	ConfirmStatus string `json:"confirm_status" gorm:"type:varchar(255)"`
-	PeriodID      string `json:"period_id" gorm:"type:varchar(255)"`
-	Permission    string `json:"permission" gorm:"type:varchar(255)"`
-
-	StartTime time.Time
-
-	common.Model `json:"-"`
-	common.RawDataOrigin
-}
-
-func (FeishuOkrUserOkr) TableName() string {
-	return "_tool_feishu_okr_user_okr"
+type FeishuChatMemberResult struct {
+	Code int64  `json:"code"`
+	Msg  string `json:"msg"`
+	Data struct {
+		Items []json.RawMessage `json:"items"`
+	} `json:"data"`
 }

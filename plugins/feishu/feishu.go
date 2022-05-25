@@ -47,8 +47,9 @@ func (plugin Feishu) Description() string {
 
 func (plugin Feishu) SubTaskMetas() []core.SubTaskMeta {
 	return []core.SubTaskMeta{
-		tasks.CollectMeetingTopUserItemMeta,
-		tasks.ExtractMeetingTopUserItemMeta,
+		// tasks.CollectMeetingTopUserItemMeta,
+		// tasks.ExtractMeetingTopUserItemMeta,
+		tasks.CollectChatMemberMeta,
 	}
 }
 

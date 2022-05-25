@@ -40,7 +40,7 @@ type ApiAccessTokenResponse struct {
 }
 
 const AUTH_ENDPOINT = "https://open.feishu.cn"
-const ENDPOINT = "https://open.feishu.cn/open-apis/vc/v1"
+const ENDPOINT = "https://open.feishu.cn/open-apis"
 
 func NewFeishuApiClient(taskCtx core.TaskContext) (*helper.ApiAsyncClient, error) {
 	// load and process cconfiguration
