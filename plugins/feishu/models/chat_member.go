@@ -24,14 +24,13 @@ import (
 )
 
 type FeishuChatMember struct {
-	MemberID     string `json:"member_id" gorm:"type:varchar(255)"`
+	MemberID     string `json:"member_id" gorm:"primaryKey;type:varchar(255)"`
 	Name         string `json:"name" gorm:"type:varchar(255)"`
 	MemberIDType string `json:"member_id_type" gorm:"type:varchar(255)"`
 
 	StartTime time.Time
 
-	common.Model `json:"-"`
-	common.RawDataOrigin
+	common.NoPKModel `json:"-"`
 }
 
 func (FeishuChatMember) TableName() string {

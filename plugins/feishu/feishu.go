@@ -50,6 +50,7 @@ func (plugin Feishu) SubTaskMetas() []core.SubTaskMeta {
 		// tasks.CollectMeetingTopUserItemMeta,
 		// tasks.ExtractMeetingTopUserItemMeta,
 		tasks.CollectChatMemberMeta,
+		tasks.ExtractChatMemberMeta,
 	}
 }
 

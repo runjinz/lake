@@ -47,7 +47,7 @@ func CollectChatMember(taskCtx core.SubTaskContext) error {
 		RawDataSubTaskArgs: helper.RawDataSubTaskArgs{
 			Ctx: taskCtx,
 			Params: FeishuApiParams{
-				ApiResName: "okr_users",
+				ApiResName: "chat_member",
 			},
 			Table: RAW_OKR_USER_OKR_TABLE,
 		},

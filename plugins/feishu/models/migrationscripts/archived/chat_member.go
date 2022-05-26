@@ -15,28 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package migrationscripts
+package archived
 
 import (
-	"context"
+	"time"
 
-	"github.com/apache/incubator-devlake/plugins/feishu/models/migrationscripts/archived"
-	"gorm.io/gorm"
+	"github.com/apache/incubator-devlake/models/common"
 )
 
-type InitSchemas struct{}
+type FeishuChatMember struct {
+	MemberID     string `json:"member_id" gorm:"primaryKey;type:varchar(255)"`
+	Name         string `json:"name" gorm:"type:varchar(255)"`
+	MemberIDType string `json:"member_id_type" gorm:"type:varchar(255)"`
 
-func (*InitSchemas) Up(ctx context.Context, db *gorm.DB) error {
-	return db.Migrator().AutoMigrate(
-		&archived.FeishuMeetingTopUserItem{},
-		&archived.FeishuChatMember{},
-	)
+	StartTime time.Time
+
+	common.NoPKModel `json:"-"`
 }
 
-func (*InitSchemas) Version() uint64 {
-	return 20220407201134
-}
-
-func (*InitSchemas) Name() string {
-	return "Feishu init schemas"
+func (FeishuChatMember) TableName() string {
+	return "_tool_feishu_chat_user"
 }
