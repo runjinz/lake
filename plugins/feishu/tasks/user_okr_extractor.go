@@ -33,7 +33,7 @@ func ExtractUserOkr(taskCtx core.SubTaskContext) error {
 		RawDataSubTaskArgs: helper.RawDataSubTaskArgs{
 			Ctx: taskCtx,
 			Params: FeishuApiParams{
-				ApiResName: "user_okr",
+				ApiResName: "user_okrs",
 			},
 			Table: RAW_OKR_USER_OKRS_TABLE,
 		},
