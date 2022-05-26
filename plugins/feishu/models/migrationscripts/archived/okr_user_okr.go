@@ -27,14 +27,13 @@ type FeishuOkrUserOkr struct {
 	ID            string `json:"id" gorm:"type:varchar(255)"`
 	MemberID      string `json:"member_id" gorm:"type:varchar(255)"`
 	Name          string `json:"name" gorm:"type:varchar(255)"`
-	ConfirmStatus string `json:"confirm_status" gorm:"type:varchar(255)"`
+	ConfirmStatus int    `json:"confirm_status"`
 	PeriodID      string `json:"period_id" gorm:"type:varchar(255)"`
-	Permission    string `json:"permission" gorm:"type:varchar(255)"`
+	Permission    int    `json:"permission"`
 
 	StartTime time.Time
 
-	common.Model `json:"-"`
-	common.RawDataOrigin
+	common.NoPKModel `json:"-"`
 }
 
 func (FeishuOkrUserOkr) TableName() string {

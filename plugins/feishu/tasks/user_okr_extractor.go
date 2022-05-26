@@ -33,7 +33,7 @@ func ExtractUserOkr(taskCtx core.SubTaskContext) error {
 		RawDataSubTaskArgs: helper.RawDataSubTaskArgs{
 			Ctx: taskCtx,
 			Params: FeishuApiParams{
-				ApiResName: "user_okr",
+				ApiResName: "user_okrs",
 			},
 			Table: RAW_OKR_USER_OKRS_TABLE,
 		},
@@ -43,15 +43,14 @@ func ExtractUserOkr(taskCtx core.SubTaskContext) error {
 			if err != nil {
 				return nil, err
 			}
-			rawInput := &helper.DatePair{}
+			rawInput := &models.FeishuChatMember{}
 			rawErr := json.Unmarshal(row.Input, rawInput)
 			if rawErr != nil {
 				return nil, rawErr
 			}
 			results := make([]interface{}, 0)
 			results = append(results, &models.FeishuOkrUserOkr{
-				StartTime:     rawInput.PairStartTime.AddDate(0, 0, -1),
-				MemberID:      body.MemberID,
+				MemberID:      rawInput.MemberID,
 				Name:          body.Name,
 				ID:            body.ID,
 				ConfirmStatus: body.ConfirmStatus,
