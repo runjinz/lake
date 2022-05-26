@@ -47,12 +47,13 @@ func (plugin Feishu) Description() string {
 
 func (plugin Feishu) SubTaskMetas() []core.SubTaskMeta {
 	return []core.SubTaskMeta{
-		// tasks.CollectMeetingTopUserItemMeta,
-		// tasks.ExtractMeetingTopUserItemMeta,
-		// tasks.CollectChatMemberMeta,
-		// tasks.ExtractChatMemberMeta,
-		// tasks.CollectUserOkrsMeta,
-		tasks.ExtractUserOkrMeta,
+		tasks.CollectMeetingTopUserItemMeta,
+		tasks.ExtractMeetingTopUserItemMeta,
+		tasks.CollectChatMemberMeta,
+		tasks.ExtractChatMemberMeta,
+		tasks.CollectUserOkrsMeta,
+		// tasks.ExtractUserOkrMeta,
+		// tasks.ExtractUserObjectiveMeta,
 	}
 }
 

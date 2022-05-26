@@ -20,7 +20,7 @@ package migrationscripts
 import (
 	"context"
 
-	"github.com/apache/incubator-devlake/plugins/feishu/models/migrationscripts/archived"
+	"github.com/apache/incubator-devlake/plugins/feishu/models"
 	"gorm.io/gorm"
 )
 
@@ -28,11 +28,11 @@ type InitSchemas struct{}
 
 func (*InitSchemas) Up(ctx context.Context, db *gorm.DB) error {
 	return db.Migrator().AutoMigrate(
-		&archived.FeishuMeetingTopUserItem{},
-		&archived.FeishuChatMember{},
-		&archived.FeishuOkrUserOkr{},
-		&archived.FeishuOkrUserObjective{},
-		&archived.FeishuOkrUserKeyResult{},
+		&models.FeishuMeetingTopUserItem{},
+		&models.FeishuChatMember{},
+		&models.FeishuOkrUserOkr{},
+		// &models.FeishuOkrUserObjective{},
+		// &models.FeishuOkrUserKeyResult{},
 	)
 }
 

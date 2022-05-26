@@ -18,8 +18,6 @@ limitations under the License.
 package models
 
 import (
-	"time"
-
 	"github.com/apache/incubator-devlake/models/common"
 )
 
@@ -27,8 +25,6 @@ type FeishuChatMember struct {
 	MemberID     string `json:"member_id" gorm:"primaryKey;type:varchar(255)"`
 	Name         string `json:"name" gorm:"type:varchar(255)"`
 	MemberIDType string `json:"member_id_type" gorm:"type:varchar(255)"`
-
-	StartTime time.Time
 
 	common.NoPKModel `json:"-"`
 }

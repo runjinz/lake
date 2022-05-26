@@ -18,8 +18,6 @@ limitations under the License.
 package models
 
 import (
-	"time"
-
 	"github.com/apache/incubator-devlake/models/common"
 )
 
@@ -44,10 +42,7 @@ type FeishuOkrUserKeyResult struct {
 	Weight                             int      `json:"weight"`
 	KrWeight                           int      `json:"kr_weight"`
 
-	StartTime time.Time
-
-	common.Model `json:"-"`
-	common.RawDataOrigin
+	common.NoPKModel `json:"-"`
 }
 
 func (FeishuOkrUserKeyResult) TableName() string {

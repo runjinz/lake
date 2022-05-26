@@ -24,7 +24,7 @@ import (
 )
 
 type FeishuOkrUserOkr struct {
-	ID            string `json:"id" gorm:"type:varchar(255)"`
+	ID            string `json:"id" gorm:"pramaryKey;type:varchar(255)"`
 	MemberID      string `json:"member_id" gorm:"type:varchar(255)"`
 	Name          string `json:"name" gorm:"type:varchar(255)"`
 	ConfirmStatus int    `json:"confirm_status"`

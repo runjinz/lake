@@ -18,8 +18,6 @@ limitations under the License.
 package models
 
 import (
-	"time"
-
 	"github.com/apache/incubator-devlake/models/common"
 )
 
@@ -30,8 +28,6 @@ type FeishuOkrUserOkr struct {
 	ConfirmStatus int    `json:"confirm_status"`
 	PeriodID      string `json:"period_id" gorm:"type:varchar(255)"`
 	Permission    int    `json:"permission"`
-
-	StartTime time.Time
 
 	common.NoPKModel `json:"-"`
 }

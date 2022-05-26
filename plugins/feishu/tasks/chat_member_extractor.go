@@ -50,7 +50,6 @@ func ExtractChatMember(taskCtx core.SubTaskContext) error {
 			}
 			results := make([]interface{}, 0)
 			results = append(results, &models.FeishuChatMember{
-				StartTime:    rawInput.PairStartTime.AddDate(0, 0, -1),
 				MemberID:     body.MemberID,
 				Name:         body.Name,
 				MemberIDType: body.MemberIDType,
