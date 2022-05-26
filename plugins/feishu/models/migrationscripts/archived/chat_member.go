@@ -34,5 +34,5 @@ type FeishuChatMember struct {
 }
 
 func (FeishuChatMember) TableName() string {
-	return "_tool_feishu_chat_user"
+	return "_tool_feishu_chat_members"
 }

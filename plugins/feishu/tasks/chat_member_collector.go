@@ -29,7 +29,7 @@ import (
 	"github.com/apache/incubator-devlake/plugins/helper"
 )
 
-const RAW_OKR_USER_OKR_TABLE = "feishu_okr_user_okr"
+const RAW_OKR_USER_OKR_TABLE = "feishu_chat_members"
 
 var _ core.SubTaskEntryPoint = CollectChatMember
 
