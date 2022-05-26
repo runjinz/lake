@@ -51,5 +51,5 @@ type FeishuOkrUserKeyResult struct {
 }
 
 func (FeishuOkrUserKeyResult) TableName() string {
-	return "_tool_feishu_okr_user_objective"
+	return "_tool_feishu_okr_user_keyresults"
 }

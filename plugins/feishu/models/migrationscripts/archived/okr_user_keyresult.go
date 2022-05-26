@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package models
+package archived
 
 import (
 	"time"
@@ -23,17 +23,15 @@ import (
 	"github.com/apache/incubator-devlake/models/common"
 )
 
-type FeishuOkrUserObjective struct {
+type FeishuOkrUserKeyResult struct {
 	ID                                 string   `json:"id" gorm:"type:varchar(255)"`
-	OkrID                              string   `json:"okr_id" gorm:"type:varchar(255)"`
+	ObjectiveID                        string   `json:"objective_id" gorm:"type:varchar(255)"`
 	MemberID                           string   `json:"member_id" gorm:"type:varchar(255)"`
 	Content                            string   `json:"content" gorm:"type:varchar(255)"`
 	Deadline                           string   `json:"deadline" gorm:"type:varchar(255)"`
 	Permission                         string   `json:"permission" gorm:"type:varchar(255)"`
 	MentionedUsers                     []string `json:"mentioned_user_list" gorm:"type:varchar(255)"`
 	ProgressRecords                    []string `json:"progress_record_list" gorm:"type:varchar(255)"`
-	AlignedObjectives                  []string `json:"aligned_objective_list" gorm:"type:varchar(255)"`
-	AligningObjectives                 []string `json:"aligning_objective_list" gorm:"type:varchar(255)"`
 	ProgressRateStatus                 string   `json:"progress_rate_status" gorm:"type:varchar(255)"`
 	ProgressRatePercent                int      `json:"progress_rate_percent"`
 	ProgressReport                     string   `json:"progress_report" gorm:"type:varchar(255)"`
@@ -44,6 +42,7 @@ type FeishuOkrUserObjective struct {
 	ScoreLastUpdatedTime               string   `json:"score_last_updated_time" gorm:"type:varchar(255)"`
 	Score                              int      `json:"score"`
 	Weight                             int      `json:"weight"`
+	KrWeight                           int      `json:"kr_weight"`
 
 	StartTime time.Time
 
@@ -51,6 +50,6 @@ type FeishuOkrUserObjective struct {
 	common.RawDataOrigin
 }
 
-func (FeishuOkrUserObjective) TableName() string {
-	return "_tool_feishu_okr_user_objectives"
+func (FeishuOkrUserKeyResult) TableName() string {
+	return "_tool_feishu_okr_user_keyresults"
 }

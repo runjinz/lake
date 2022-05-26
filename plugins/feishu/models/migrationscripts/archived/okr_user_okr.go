@@ -15,14 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package models
+package archived
 
 import (
 	"time"
+
+	"github.com/apache/incubator-devlake/models/common"
 )
 
 type FeishuOkrUserOkr struct {
-	ID            string `json:"id" gorm:"primaryKey;type:varchar(255)"`
+	ID            string `json:"id" gorm:"type:varchar(255)"`
 	MemberID      string `json:"member_id" gorm:"type:varchar(255)"`
 	Name          string `json:"name" gorm:"type:varchar(255)"`
 	ConfirmStatus string `json:"confirm_status" gorm:"type:varchar(255)"`
@@ -30,6 +32,9 @@ type FeishuOkrUserOkr struct {
 	Permission    string `json:"permission" gorm:"type:varchar(255)"`
 
 	StartTime time.Time
+
+	common.Model `json:"-"`
+	common.RawDataOrigin
 }
 
 func (FeishuOkrUserOkr) TableName() string {

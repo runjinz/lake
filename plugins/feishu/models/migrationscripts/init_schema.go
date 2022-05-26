@@ -30,6 +30,9 @@ func (*InitSchemas) Up(ctx context.Context, db *gorm.DB) error {
 	return db.Migrator().AutoMigrate(
 		&archived.FeishuMeetingTopUserItem{},
 		&archived.FeishuChatMember{},
+		&archived.FeishuOkrUserOkr{},
+		&archived.FeishuOkrUserObjective{},
+		&archived.FeishuOkrUserKeyResult{},
 	)
 }
 

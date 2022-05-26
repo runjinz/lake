@@ -25,20 +25,20 @@ import (
 	"github.com/apache/incubator-devlake/plugins/helper"
 )
 
-var _ core.SubTaskEntryPoint = ExtractChatMember
+var _ core.SubTaskEntryPoint = ExtractUserOkr
 
-func ExtractChatMember(taskCtx core.SubTaskContext) error {
+func ExtractUserOkr(taskCtx core.SubTaskContext) error {
 
 	exetractor, err := helper.NewApiExtractor(helper.ApiExtractorArgs{
 		RawDataSubTaskArgs: helper.RawDataSubTaskArgs{
 			Ctx: taskCtx,
 			Params: FeishuApiParams{
-				ApiResName: "chat_member",
+				ApiResName: "user_okr",
 			},
-			Table: RAW_CHAT_MEMBERS_TABLE,
+			Table: RAW_OKR_USER_OKRS_TABLE,
 		},
 		Extract: func(row *helper.RawData) ([]interface{}, error) {
-			body := &models.FeishuChatMember{}
+			body := &models.FeishuOkrUserOkr{}
 			err := json.Unmarshal(row.Data, body)
 			if err != nil {
 				return nil, err
@@ -49,11 +49,14 @@ func ExtractChatMember(taskCtx core.SubTaskContext) error {
 				return nil, rawErr
 			}
 			results := make([]interface{}, 0)
-			results = append(results, &models.FeishuChatMember{
-				StartTime:    rawInput.PairStartTime.AddDate(0, 0, -1),
-				MemberID:     body.MemberID,
-				Name:         body.Name,
-				MemberIDType: body.MemberIDType,
+			results = append(results, &models.FeishuOkrUserOkr{
+				StartTime:     rawInput.PairStartTime.AddDate(0, 0, -1),
+				MemberID:      body.MemberID,
+				Name:          body.Name,
+				ID:            body.ID,
+				ConfirmStatus: body.ConfirmStatus,
+				PeriodID:      body.PeriodID,
+				Permission:    body.Permission,
 			})
 			return results, nil
 		},
@@ -65,9 +68,9 @@ func ExtractChatMember(taskCtx core.SubTaskContext) error {
 	return exetractor.Execute()
 }
 
-var ExtractChatMemberMeta = core.SubTaskMeta{
-	Name:             "extractChatMember",
-	EntryPoint:       ExtractChatMember,
+var ExtractUserOkrMeta = core.SubTaskMeta{
+	Name:             "extractUserOkr",
+	EntryPoint:       ExtractUserOkr,
 	EnabledByDefault: true,
-	Description:      "Extrat raw chat member data into tool layer table",
+	Description:      "Extrat raw user okrs data into tool layer table",
 }

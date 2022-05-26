@@ -21,57 +21,66 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strconv"
 
-	"github.com/apache/incubator-devlake/config"
 	"github.com/apache/incubator-devlake/plugins/core"
 	"github.com/apache/incubator-devlake/plugins/feishu/apimodels"
+	"github.com/apache/incubator-devlake/plugins/feishu/models"
 	"github.com/apache/incubator-devlake/plugins/helper"
 )
 
-const RAW_CHAT_MEMBERS_TABLE = "feishu_chat_members"
+const RAW_OKR_USER_OKRS_TABLE = "feishu_okr_user_okrs"
 
-var _ core.SubTaskEntryPoint = CollectChatMember
+var _ core.SubTaskEntryPoint = CollectUserOkrs
 
-func CollectChatMember(taskCtx core.SubTaskContext) error {
+func CollectUserOkrs(taskCtx core.SubTaskContext) error {
+
 	data := taskCtx.GetData().(*FeishuTaskData)
-	pageSize := 100
-	// NumOfDaysToCollectInt := int(data.Options.NumOfDaysToCollect)
-	// iterator, err := helper.NewDateIterator(NumOfDaysToCollectInt)
-	// if err != nil {
-	// 	return err
-	// }
+	db := taskCtx.GetDb()
+
+	// filter out issue_ids that needed collection
+	tx := db.Table("_tool_feishu_chat_members t").
+		Select("t.member_id,t.name,t.member_id_type")
+
+	// construct the input iterator
+	cursor, err := tx.Rows()
+	if err != nil {
+		return err
+	}
+	// smaller struct can reduce memory footprint, we should try to avoid using big struct
+	iterator, err := helper.NewCursorIterator(db, cursor, reflect.TypeOf(models.FeishuChatMember{}))
+	if err != nil {
+		return err
+	}
+
 	incremental := false
 
 	collector, err := helper.NewApiCollector(helper.ApiCollectorArgs{
 		RawDataSubTaskArgs: helper.RawDataSubTaskArgs{
 			Ctx: taskCtx,
 			Params: FeishuApiParams{
-				ApiResName: "chat_member",
+				ApiResName: "user_okrs",
 			},
-			Table: RAW_CHAT_MEMBERS_TABLE,
+			Table: RAW_OKR_USER_OKRS_TABLE,
 		},
 		ApiClient:   data.ApiClient,
 		Incremental: incremental,
-		// Input:       iterator,
-		// UrlTemplate: "/okr/v1/users/:user_id/okrs",
-		UrlTemplate: "im/v1/chats/" + config.GetConfig().GetString("FEISHU_CHATID") + "/members",
+		Input:       iterator,
+		UrlTemplate: "/okr/v1/users/{{ .Input.MemberID }}/okrs",
 		Query: func(reqData *helper.RequestData) (url.Values, error) {
 			query := url.Values{}
-			// input := reqData.Input.(*helper.DatePair)
-			// query.Set("start_time", strconv.FormatInt(input.PairStartTime.Unix(), 10))
-			// query.Set("end_time", strconv.FormatInt(input.PairEndTime.Unix(), 10))
-			query.Set("page_size", strconv.Itoa(pageSize))
-			// query.Set("order_by", "2")
+			query.Set("offset", strconv.Itoa(0))
+			query.Set("limit", strconv.Itoa(10))
 			return query, nil
 		},
 		ResponseParser: func(res *http.Response) ([]json.RawMessage, error) {
-			body := &apimodels.FeishuChatMemberResult{}
+			body := &apimodels.FeishuUserOkrResults{}
 			err := helper.UnmarshalResponse(res, body)
 			if err != nil {
 				return nil, err
 			}
-			return body.Data.Items, nil
+			return body.Data.Okrs, nil
 		},
 	})
 	if err != nil {
@@ -81,9 +90,9 @@ func CollectChatMember(taskCtx core.SubTaskContext) error {
 	return collector.Execute()
 }
 
-var CollectChatMemberMeta = core.SubTaskMeta{
-	Name:             "collectChatMember",
-	EntryPoint:       CollectChatMember,
+var CollectUserOkrsMeta = core.SubTaskMeta{
+	Name:             "collectUserOkrs",
+	EntryPoint:       CollectUserOkrs,
 	EnabledByDefault: true,
-	Description:      "Collect chat member data from Feishu api",
+	Description:      "Collect user okrs data from Feishu api",
 }
